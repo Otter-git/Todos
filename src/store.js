@@ -1,16 +1,16 @@
 import { configureStore } from "@reduxjs/toolkit";
-import logger from 'redux-logger';
-import {
-  persistStore,
-  persistReducer,
-  FLUSH,
-  REHYDRATE,
-  PAUSE,
-  PERSIST,
-  PURGE,
-  REGISTER
-} from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
+// import logger from 'redux-logger';
+// import {
+//   persistStore,
+//   persistReducer,
+//   FLUSH,
+//   REHYDRATE,
+//   PAUSE,
+//   PERSIST,
+//   PURGE,
+//   REGISTER
+// } from 'redux-persist';
+// import storage from 'redux-persist/lib/storage';
 import { combineReducers } from "@reduxjs/toolkit/dist";
 
 import { todoReducer } from "./features/Todos/todo-slice";
@@ -21,28 +21,28 @@ const rootReducer = combineReducers({
   filter: filterReducer,
 });
 
-const persistConfig = {
-  key: 'root',
-  storage,
-};
+// const persistConfig = {
+//   key: 'root',
+//   storage,
+// };
 
-const persistedReducer = persistReducer(persistConfig, rootReducer);
+// const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
-  reducer: persistedReducer,
+  reducer: rootReducer,
   devTools: true,
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware({
-    serializableCheck: {
-      ignoreActions: [
-        FLUSH,
-        REHYDRATE,
-        PAUSE,
-        PERSIST,
-        PURGE,
-        REGISTER,
-      ]
-    }
-  }).concat(logger),
+  // middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+  //   serializableCheck: {
+  //     ignoreActions: [
+  //       FLUSH,
+  //       REHYDRATE,
+  //       PAUSE,
+  //       PERSIST,
+  //       PURGE,
+  //       REGISTER,
+  //     ]
+  //   }
+  // }).concat(logger),
 });
 
-export const persistor = persistStore(store);
+// export const persistor = persistStore(store);
