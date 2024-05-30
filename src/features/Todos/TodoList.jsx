@@ -14,7 +14,7 @@ export const TodoList = () => {
 
   return (
     <ul>
-      {error && <h2>Error!</h2>}
+      {error && <h2>{error}</h2>}
       {loading === 'loading' && <h2>Loading...</h2>}
       {loading === 'idle' && !error && todos.map((todo) => (
         <li key={todo.id}>
