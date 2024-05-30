@@ -1,84 +1,37 @@
-import { nanoid, createSlice, configureStore } from "@reduxjs/toolkit";
-import { createAction } from "@reduxjs/toolkit/dist";
+import { configureStore } from "@reduxjs/toolkit";
 import logger from 'redux-logger';
+import {
+  persistStore,
+  persistReducer,
+  FLUSH,
+  REHYDRATE,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER
+} from 'redux-persist';
+import { storage } from 'redux-persist/lib/storage';
+import { combineReducers } from "@reduxjs/toolkit/dist";
 
-export const resetToDefault = createAction('root/reset-app');
+import { todoReducer } from "./features/Todos/todo-slice";
+import { filterReducer } from "./features/Filters/filter-slice";
 
-const todoSlice = createSlice({
-  name: '@@todos',
-  initialState: [],
-  reducers: {
-    addTodo: {
-      reducer: (state, action) => {
-        state.push(action.payload)
-      },
-      prepare: (title) => ({
-        payload: {
-          title,
-          id: nanoid(),
-          completed: false
-        }
-      })
-    },
-    removeTodo: (state, action) => {
-      const id = action.payload;
-      return state.filter((todo) => todo.id !== id);
-    },
-    toggleTodo: (state, action) => {
-      const id = action.payload;
-      const todo = state.find((todo) => todo.id === id);
-      todo.completed = !todo.completed;
-    },
-  },
-  extraReducers: (builder) => {
-    builder.addCase(resetToDefault, () => {
-      return []
-    })
-  }
+const rootReducer = combineReducers({
+  todos: todoReducer,
+  filter: filterReducer,
 });
 
-const filterSlice = createSlice({
-  name: 'filter',
-  initialState: 'all',
-  reducers: {
-    setFilter: (_, action) => {
-      return action.payload
-    }
-  },
-  extraReducers: (builder) => {
-    builder.addCase(resetToDefault, () => {
-      return 'all'
-    })
-  }
-})
+const persistConfig = {
+  key: 'root',
+  storage,
+};
 
-export const { setFilter } = filterSlice.actions;
-export const { addTodo, removeTodo, toggleTodo } = todoSlice.actions;
+const persistedReducer = persistReducer(persistConfig, rootReducer)
 
 export const store = configureStore({
-  reducer: {
-    todos: todoSlice.reducer,
-    filter: filterSlice.reducer,
-  },
+  reducer: persistedReducer,
   devTools: true,
-  // middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger),
-  // preloadedState: [{ id: 1, title: 'Redux', completed: true, }],
-  // enhancers: []
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger),
 });
 
-export const selectVisibleTodos = (state, filter) => {
-  switch (filter) {
-    case 'all': {
-      return state.todos;
-    }
-    case 'active': {
-      return state.todos.filter(todo => !todo.completed);
-    }
-    case 'completed': {
-      return state.todos.filter(todo => todo.completed);
-    }
-    default: {
-      return state.todos;
-    }
-  }
-}
+export const persistor = persistStore(store);
