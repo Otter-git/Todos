@@ -10,7 +10,7 @@ import {
   PURGE,
   REGISTER
 } from 'redux-persist';
-import { storage } from 'redux-persist/lib/storage';
+import storage from 'redux-persist/lib/storage';
 import { combineReducers } from "@reduxjs/toolkit/dist";
 
 import { todoReducer } from "./features/Todos/todo-slice";
@@ -26,12 +26,23 @@ const persistConfig = {
   storage,
 };
 
-const persistedReducer = persistReducer(persistConfig, rootReducer)
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
   reducer: persistedReducer,
   devTools: true,
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+    serializableCheck: {
+      ignoreActions: [
+        FLUSH,
+        REHYDRATE,
+        PAUSE,
+        PERSIST,
+        PURGE,
+        REGISTER,
+      ]
+    }
+  }).concat(logger),
 });
 
 export const persistor = persistStore(store);
