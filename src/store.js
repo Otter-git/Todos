@@ -1,5 +1,8 @@
-import { createStore } from "redux";
 import { nanoid, createSlice, configureStore } from "@reduxjs/toolkit";
+import { createAction } from "@reduxjs/toolkit/dist";
+import logger from 'redux-logger';
+
+export const resetToDefault = createAction('root/reset-app');
 
 const todoSlice = createSlice({
   name: '@@todos',
@@ -27,8 +30,55 @@ const todoSlice = createSlice({
       todo.completed = !todo.completed;
     },
   },
+  extraReducers: (builder) => {
+    builder.addCase(resetToDefault, () => {
+      return []
+    })
+  }
 });
 
+const filterSlice = createSlice({
+  name: 'filter',
+  initialState: 'all',
+  reducers: {
+    setFilter: (_, action) => {
+      return action.payload
+    }
+  },
+  extraReducers: (builder) => {
+    builder.addCase(resetToDefault, () => {
+      return 'all'
+    })
+  }
+})
+
+export const { setFilter } = filterSlice.actions;
 export const { addTodo, removeTodo, toggleTodo } = todoSlice.actions;
 
-export const store = configureStore(todoSlice.reducer);
+export const store = configureStore({
+  reducer: {
+    todos: todoSlice.reducer,
+    filter: filterSlice.reducer,
+  },
+  devTools: true,
+  // middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger),
+  // preloadedState: [{ id: 1, title: 'Redux', completed: true, }],
+  // enhancers: []
+});
+
+export const selectVisibleTodos = (state, filter) => {
+  switch (filter) {
+    case 'all': {
+      return state.todos;
+    }
+    case 'active': {
+      return state.todos.filter(todo => !todo.completed);
+    }
+    case 'completed': {
+      return state.todos.filter(todo => todo.completed);
+    }
+    default: {
+      return state.todos;
+    }
+  }
+}
