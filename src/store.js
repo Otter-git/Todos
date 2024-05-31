@@ -1,4 +1,4 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
 // import logger from 'redux-logger';
 // import {
 //   persistStore,
@@ -15,6 +15,7 @@ import { combineReducers } from "@reduxjs/toolkit/dist";
 
 import { todoReducer } from "./features/Todos/todo-slice";
 import { filterReducer } from "./features/Filters/filter-slice";
+import * as api from './api';
 
 const rootReducer = combineReducers({
   todos: todoReducer,
@@ -31,6 +32,11 @@ const rootReducer = combineReducers({
 export const store = configureStore({
   reducer: rootReducer,
   devTools: true,
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+    thunk: {
+      extraArgument: api
+    }
+  })
   // middleware: (getDefaultMiddleware) => getDefaultMiddleware({
   //   serializableCheck: {
   //     ignoreActions: [
