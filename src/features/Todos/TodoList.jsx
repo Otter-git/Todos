@@ -1,10 +1,11 @@
 import { useSelector, useDispatch } from "react-redux";
-import { selectVisibleTodos, toggleTodo, removeTodo, loadTodos } from "./todo-slice";
+import { selectVisibleTodos, toggleTodo, removeTodo, loadTodos, todosSelectors } from "./todo-slice";
 import { useEffect } from "react";
 
 export const TodoList = () => {
   const activeFilter = useSelector(state => state.filter)
-  const todos = useSelector(state => selectVisibleTodos(state, activeFilter));
+  const todos = useSelector(todosSelectors.selectAll);
+  const visibleTodos = selectVisibleTodos(todos, activeFilter);
   const dispatch = useDispatch();
   const { error, loading } = useSelector(state => state.todos);
 
@@ -20,7 +21,7 @@ export const TodoList = () => {
     <ul>
       {error && <h2>{error}</h2>}
       {loading === 'loading' && <h2>Loading...</h2>}
-      {loading === 'idle' && !error && todos.map((todo) => (
+      {loading === 'idle' && !error && visibleTodos.map((todo) => (
         <li key={todo.id}>
           <input
             type="checkbox"
