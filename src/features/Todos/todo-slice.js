@@ -12,6 +12,14 @@ export const loadTodos = createAsyncThunk(
     } catch (err) {
       return rejectWithValue('Failed to fetch all todos.')
     }
+  },
+  {
+    condition: (_, { getState, extra }) => {
+      const { loading } = getState().todos;
+      if (loading === 'loading') {
+        return false;
+      }
+    }
   }
 );
 

@@ -9,7 +9,11 @@ export const TodoList = () => {
   const { error, loading } = useSelector(state => state.todos);
 
   useEffect(() => {
-    dispatch(loadTodos());
+    const promise = dispatch(loadTodos());
+
+    return () => {
+      promise.abort();
+    }
   }, [dispatch]);
 
   return (
